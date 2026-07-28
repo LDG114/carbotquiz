@@ -286,41 +286,15 @@
         osc.stop(now + 0.3);
     }
 
-function playApplauseSound() {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    
-    // 0.8초 동안 총 30번의 짝짝짝 박수 파동을 시간차를 두고 재생
-    const now = audioCtx.currentTime;
-    for (let i = 0; i < 30; i++) {
-        const timeOffset = i * 0.025 + Math.random() * 0.015; // 각 박수 소리가 나는 시점을 뒤로 밀어줌
-        const startTime = now + timeOffset;
-
-        const bufferSize = audioCtx.sampleRate * 0.04;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let j = 0; j < bufferSize; j++) {
-            data[j] = Math.random() * 2 - 1;
-        }
-
-        const noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-
-        const filter = audioCtx.createBiquadFilter();
-        filter.type = 'bandpass';
-        // 음높이를 다채롭게 섞어 풍성하게 만듦
-        filter.frequency.value = 800 + Math.random() * 1000;
-
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.25, startTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.04);
-
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        noise.start(startTime);
-        noise.stop(startTime + 0.04);
-    }
+ffunction playApplauseSound() {
+    // 실제 사람 박수 소리 MP3 (Wikimedia Commons 무료 음원)
+    const applauseAudio = new Audio('https://upload.wikimedia.org/wikipedia/commons/2/27/Applause_01.ogg');
+    applauseAudio.volume = 0.7;
+    applauseAudio.play().catch(e => {
+        console.log("박수 소리 재생 실패:", e);
+        // 혹시 파일 재생 실패 시 대체용 소리 재생
+        playCorrectSound();
+    });
 }
    
     function getRandomInt(min, max) {
