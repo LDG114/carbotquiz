@@ -319,13 +319,6 @@
     }
 }
    
-
-    function playApplauseSound() {
-        applauseAudio.currentTime = 0;
-        applauseAudio.volume = 0.5;
-        applauseAudio.play().catch(e => console.log("박수 소리 재생 실패:", e));
-    }
-
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
