@@ -286,8 +286,39 @@
         osc.stop(now + 0.3);
     }
 
-    // 👏 고품질 리얼 관중 박수/환호 효과음 (외부 파일 설치 불필요)
-    const applauseAudio = new Audio('https://cdn.pixabay.com/download/audio/2021/08/04/audio_bb630cc098.mp3?filename=applause-cheering-1-29176.mp3');
+ function playApplauseSound() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    // 외부 파일 없이 노이즈 파동을 조합하여 15회의 연속적인 박수 소리 연출
+    for (let i = 0; i < 15; i++) {
+        setTimeout(() => {
+            const bufferSize = audioCtx.sampleRate * 0.05;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let j = 0; j < bufferSize; j++) {
+                data[j] = Math.random() * 2 - 1;
+            }
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = 1000 + Math.random() * 800;
+
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            noise.start();
+        }, i * 60 + Math.random() * 30);
+    }
+}
+   
 
     function playApplauseSound() {
         applauseAudio.currentTime = 0;
