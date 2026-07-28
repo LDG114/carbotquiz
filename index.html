@@ -212,7 +212,7 @@
     // 🎵 MP3 오디오 제어
     const bgm = document.getElementById('bgm');
     bgm.volume = 0.3;
-
+    
     function startBgmOnFirstInteraction() {
         if (!bgmStarted) {
             bgm.currentTime = 0;
@@ -287,7 +287,7 @@
     }
 
     // 👏 고품질 리얼 관중 박수/환호 효과음 (외부 파일 설치 불필요)
-    const applauseAudio = new Audio('https://actions.google.com/sounds/v1/crowds/human_cheering_medium.ogg');
+    const applauseAudio = new Audio('https://cdn.pixabay.com/download/audio/2021/08/04/audio_bb630cc098.mp3?filename=applause-cheering-1-29176.mp3');
 
     function playApplauseSound() {
         applauseAudio.currentTime = 0;
