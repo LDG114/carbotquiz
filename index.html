@@ -215,6 +215,7 @@
 
     function startBgmOnFirstInteraction() {
         if (!bgmStarted) {
+            bgm.currentTime = 0;
             bgm.play().then(() => {
                 bgmStarted = true;
                 document.getElementById('bgmToggleBtn').innerText = '🎵 음악 끄기';
@@ -236,7 +237,7 @@
         }
     }
 
-    // 🔊 효과음 (Web Audio API)
+    // 🔊 정답/오답 효과음 (Web Audio API)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playCorrectSound() {
@@ -285,12 +286,29 @@
         osc.stop(now + 0.3);
     }
 
+    // 👏 고품질 리얼 관중 박수/환호 효과음 (외부 파일 설치 불필요)
+    const applauseAudio = new Audio('https://actions.google.com/sounds/v1/crowds/human_cheering_medium.ogg');
+
+    function playApplauseSound() {
+        applauseAudio.currentTime = 0;
+        applauseAudio.volume = 0.5;
+        applauseAudio.play().catch(e => console.log("박수 소리 재생 실패:", e));
+    }
+
     function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function initGame() {
         currentRound = 1;
+        
+        // 🔄 게임 다시 시작 시 BGM 재개
+        if (bgmStarted) {
+            bgm.currentTime = 0;
+            bgm.play().catch(e => console.log(e));
+            document.getElementById('bgmToggleBtn').innerText = '🎵 음악 끄기';
+        }
+        
         generateQuestion();
     }
 
@@ -332,7 +350,7 @@
             const btn = document.createElement('button');
             btn.className = `option-btn ${btnStyles[index]}`;
             btn.id = `opt-btn-${index}`;
-            btn.innerText = num; // [A], [S], [D] 글자 없이 숫자만 표시
+            btn.innerText = num;
 
             btn.onclick = () => {
                 startBgmOnFirstInteraction();
@@ -370,7 +388,14 @@
     }
 
     function showFinalResult() {
+        // 1. ⏸️ BGM 일시정지 및 버튼 텍스트 변경
+        bgm.pause();
+        document.getElementById('bgmToggleBtn').innerText = '🎵 음악 켜기';
+
+        // 2. 👏 박수/환호 소리 및 정답음 재생
         playCorrectSound();
+        playApplauseSound();
+
         const imageDisplay = document.getElementById('imageDisplay');
         const optionsGroup = document.getElementById('optionsGroup');
         const messageEl = document.getElementById('message');
@@ -385,7 +410,7 @@
         `;
     }
 
-    // ⌨️ 키보드 'a', 's', 'd' 매핑 (화면에는 안 보이지만 입력은 가능)
+    // ⌨️ 키보드 'a', 's', 'd' 매핑
     window.addEventListener('keydown', (e) => {
         const key = e.key.toLowerCase();
         
